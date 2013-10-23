@@ -1,1 +1,11 @@
-["redis-brain.coffee", "shipit.coffee"]
+[
+  "auth.coffee",
+  "redis-brain.coffee",
+  "shipit.coffee",
+  "announce.coffee",
+  "plusplus.coffee",
+  "rageface.coffee",
+  "reload.coffee",
+  "remember.coffee",
+  "remind.coffee"
+]
