@@ -3,7 +3,6 @@
   "redis-brain.coffee",
   "shipit.coffee",
   "announce.coffee",
-  "plusplus.coffee",
   "reload.coffee",
   "remember.coffee",
   "remind.coffee"
