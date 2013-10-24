@@ -28,11 +28,14 @@ module.exports = (robot) ->
       msg.send "Current queue is: #{stringifyQueue()}"
 
   robot.respond /pop student/i, (msg) ->
-    student = popStudent()
-    msg.reply "go help #{student.name}, queued at #{student.queuedAt}"
+    if _.isEmpty robot.brain.data.instructorQueue
+      msg.send "Student queue is empty"
+    else
+      student = popStudent()
+      msg.reply "go help #{student.name}, queued at #{student.queuedAt}"
 
   robot.respond /student queue/i, (msg) ->
-    if _.isEmpty(robot.brain.data.instructorQueue)
+    if _.isEmpty robot.brain.data.instructorQueue
       msg.send "Student queue is empty"
     else
       msg.send stringifyQueue()
