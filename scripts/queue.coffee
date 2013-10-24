@@ -32,4 +32,7 @@ module.exports = (robot) ->
     msg.reply "go help #{student.name}, queued at #{student.queuedAt}"
 
   robot.respond /student queue/i, (msg) ->
-    msg.send stringifyQueue()
+    if _.isEmpty(robot.brain.data.instructorQueue)
+      msg.send "Student queue is empty"
+    else
+      msg.send stringifyQueue()
