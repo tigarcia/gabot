@@ -19,7 +19,7 @@ module.exports = (robot) ->
   popStudent = ->
     robot.brain.data.instructorQueue.shift()
 
-  robot.respond /queue me/i, (msg) ->
+  robot.respond /q(ueue)? me/i, (msg) ->
     name = msg.message.user.mention_name || msg.message.user.name
     if _.any(robot.brain.data.instructorQueue, (student) -> student.name == name)
       msg.send "#{name} is already queued"
@@ -35,8 +35,11 @@ module.exports = (robot) ->
       student = popStudent()
       msg.reply "go help #{student.name}, queued at #{student.queuedAt}"
 
-  robot.respond /student queue/i, (msg) ->
+  robot.respond /student q(ueue)?/i, (msg) ->
     if _.isEmpty robot.brain.data.instructorQueue
       msg.send "Student queue is empty"
     else
       msg.send stringifyQueue()
+
+  robot.respond /empty q(ueue)?/i, (msg) ->
+    robot.brain.data.instructorQueue = []
