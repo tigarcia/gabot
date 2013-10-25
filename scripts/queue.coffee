@@ -55,3 +55,7 @@ module.exports = (robot) ->
     if msg.message.user.mention_name == 'kyle'
       robot.brain.data.instructorQueue = []
       msg.reply "cleared the queue"
+
+  robot.respond /q(ueue)?[ .]length/i, (msg) ->
+    _.tap robot.brain.data.instructorQueue.length, (length) ->
+      msg.send "Current queue length is #{length} students."
