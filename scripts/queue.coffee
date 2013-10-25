@@ -3,6 +3,7 @@ _ = require 'underscore'
 
 module.exports = (robot) ->
   robot.brain.data.instructorQueue ?= []
+  robot.brain.data.instructorQueuePops ?= []
 
   queueStudent = (name) ->
     robot.brain.data.instructorQueue.push
@@ -36,13 +37,15 @@ module.exports = (robot) ->
     else
       msg.reply "you weren't in the queue."
 
-
   robot.respond /(pop )?student( pop)?/i, (msg) ->
     return unless msg.match[1]? || msg.match[2]?
     if _.isEmpty robot.brain.data.instructorQueue
       msg.send "Student queue is empty"
     else
       student = popStudent()
+      student.poppedAt = new Date()
+      student.poppedBy = msg.message.user.mention_name || msg.message.user.name
+      robot.brain.data.instructorQueuePops.push student
       msg.reply "go help @#{student.name}, queued at #{student.queuedAt}"
 
   robot.respond /student q(ueue)?/i, (msg) ->
@@ -59,3 +62,9 @@ module.exports = (robot) ->
   robot.respond /q(ueue)?[ .]length/i, (msg) ->
     _.tap robot.brain.data.instructorQueue.length, (length) ->
       msg.send "Current queue length is #{length} students."
+
+  robot.router.get "/queue/pops", (req, res) ->
+    res.setHeader 'Content-Type', 'text/html'
+    _.each robot.brain.data.instructorQueuePops, (student) ->
+      res.write "#{student.name} queued at #{student.queuedAt} popped at #{student.poppedAt} by #{student.poppedBy || 'nobody'}<br/>"
+    res.end()
