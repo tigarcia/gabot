@@ -1,5 +1,10 @@
 url = require 'url'
 _ = require 'underscore'
+request = require 'request'
+
+bootstrapify = (res) ->
+  res.write '<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css"></link>'
+  res.write '<script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>'
 
 module.exports = (robot) ->
   robot.hear /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[.\!\/\\w]*))?)/i, (msg) ->
@@ -13,13 +18,20 @@ module.exports = (robot) ->
       # make sure we have storage available
       robot.brain.data.gists ?= []
 
-      # store that bad boy
-      robot.brain.data.gists.push
-        link: link
-        id: _.last(robot.brain.data.gists)?.id + 1 || 0
+      request.get "#{msg.match[0]}.json", (err, res, body) ->
+        if err
+          msg.reply "There was an error processing that gist: #{err}"
+        else
+          data = JSON.parse body
 
-      console.log "Stored a gist"
-      msg.reply "Stored that gist with id #{_.last(robot.brain.data.gists).id}"
+          # store that bad boy
+          robot.brain.data.gists.push
+            link: link
+            id: (_.last(robot.brain.data.gists)?.id + 1) || 0
+            description: data.description
+            user: msg.message.user.mention_name || msg.message.user.name
+
+          msg.reply "Stored that gist with id #{_.last(robot.brain.data.gists).id}"
 
   robot.respond /delete gist ([0-9]+)/i, (msg) ->
     id = msg.match[1]
@@ -30,10 +42,17 @@ module.exports = (robot) ->
 
   robot.router.get '/gists', (req, res) ->
     res.setHeader 'Content-Type', 'text/html'
+    bootstrapify res
+    res.write '<style> span { margin-right: 5px} </style>'
+    res.write '<div class="list-group">'
     _.each robot.brain.data.gists, (gist) ->
-      res.write "#{gist.id}"
-      res.write '&nbsp;'
-      res.write url.format gist.link
-      res.write '<br/>'
+      link = url.format gist.link
+      res.write '<div class="list-group-item">'
+      res.write "<span class=\"gist-id\">#{gist.id}</span>"
+      res.write "<span class=\"gist-link\"><a href=\"#{link}\">#{link}</a></span>"
+      res.write "<span class=\"gist-description\">#{gist.description || 'No Description'}</span>"
+      res.write "<span class=\"gist-user\">#{gist.user || 'Nobody'}</span>"
+      res.write '</div>'
 
+    res.write '</div>'
     res.end()
