@@ -39,6 +39,15 @@ module.exports = (robot) ->
       gist.id != parseInt id
     msg.reply "Deleted gist with id = #{id}"
 
+  robot.respond /fetch gist descriptions/i, (msg) ->
+    msg.reply "Ok, I'll do that right now."
+    _.each robot.brain.data.gists, (gist) ->
+      unless gist.description
+        request.get "#{url.format gist.link}.json", (err, res, body) ->
+          unless err
+            gist.description = (JSON.parse body).description
+          else
+            console.log "Error fetching gist description: #{err}"
 
   robot.router.get '/gists', (req, res) ->
     res.setHeader 'Content-Type', 'text/html'
