@@ -16,7 +16,7 @@ module.exports = (robot) ->
       # store that bad boy
       robot.brain.data.gists.push
         link: link
-        id: _.last(robot.brain.data.gists).id + 1
+        id: _.last(robot.brain.data.gists)?.id + 1 || 0
 
       console.log "Stored a gist"
       msg.reply "Stored that gist with id #{_.last(robot.brain.data.gists).id}"
