@@ -10,11 +10,13 @@ module.exports = (robot) ->
  		return "It's currently #{formatDate(now)}"
 
  	beerClock = () ->
- 		happyHour = new Date("11/8/2013 17:30")
- 		nextWeek = new Date()
- 		nextWeek.setDate(happyHour.getDate() + 7)
- 		nextWeek.setHours(17,30)
- 		return "Happy hour is at #{formatDate(happyHour)}. Next week it will be at #{formatDate(nextWeek)}"
+ 		happyHour = new Date("10/18/2013 17:30")
+ 		now = new Date()
+ 		if now > happyHour
+ 			until happyHour > now
+ 				happyHour.setTime(happyHour.getTime() + 7 * 24 * 60 * 60 * 1000)
+ 		return "Happy hour is at #{formatDate(happyHour)}."
+
 
 	formatDate = (date) ->
 	  year = date.getFullYear()
