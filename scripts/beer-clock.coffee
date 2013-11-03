@@ -1,11 +1,32 @@
 _ = require 'underscore'
 
 module.exports = (robot) ->
+	robot.respond /reset beer clock (.*)/i, (msg) ->
+		date = msg.match[1]
+		unless date == " "
+			newHappyHour = new Date(date)
+
+			if newHappyHour.getHours() < 12
+				msg.reply "Did you really mean to set happy hour to a time before noon? Remember to use a 24-hour time when setting the beer clock."
+
+			else
+				robot.brain.set 'happyHourStart', newHappyHour
+				start = robot.brain.get 'happyHourStart'
+				end = new Date(start.getTime() + 1000 * 60 * 389)
+				robot.brain.set 'happyHourEnd', end
+				msg.reply "Happy hour will start at #{robot.brain.get 'happyHourStart'} and end at #{robot.brain.get 'happyHourEnd'}"
+
+		else
+			msg.reply "Please tell the bot when happy hour is! 'bot reset beer clock mm/dd/yyyy hh:mm'"
+
+	robot.respond /get beer clock/i, (msg) ->
+		msg.reply "Happy hour will start at #{new Date(robot.brain.get 'happyHourStart')} and end at #{new Date(robot.brain.get 'happyHourEnd')}."
+
 	robot.respond /beer me/i, (msg) ->
   	msg.reply beerClock()
 
 	beerClock = () ->
-		now = new Date("10/31/2013 19:00")
+		now = new Date()
 		
 		# check storage of happy hour
 		# if not there, set to the date and time of a known happy hour
