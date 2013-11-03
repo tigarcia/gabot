@@ -22,7 +22,7 @@ module.exports = (robot) ->
 	robot.respond /get beer clock/i, (msg) ->
 		msg.reply "Happy hour will start at #{new Date(robot.brain.get 'happyHourStart')} and end at #{new Date(robot.brain.get 'happyHourEnd')}."
 
-	robot.respond /beer me/i, (msg) ->
+	robot.respond /beer (.*)/i, (msg) ->
   	msg.reply beerClock()
 
 	beerClock = () ->
