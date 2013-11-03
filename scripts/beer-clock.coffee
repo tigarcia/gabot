@@ -10,7 +10,7 @@
 # Commands:
 #   hubot reset beer clock (*) - Reset the happy hour start and end to a specific time
 #   hubot get beer clock - Check the currently stored happy hour start and end
-#		hubot beer (*) - Get the countdown to the next happy hour (or a snarky response)
+#		hubot beer (*) - Get the countdown to the next happy hour (or a snarky response). Automatically reset beer clock one week in future if current happy hour has passed.
 
 
 _ = require 'underscore'
