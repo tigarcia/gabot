@@ -22,27 +22,27 @@ module.exports = (robot) ->
 
 		# if date not valid, let a user know to pass in a proper date
 		if isNaN(newHappyHour.getTime()) == true
-			msg.reply "That's not a valid date! Reset the beer clock by typing 'bot reset beer clock mm/dd/yyyy hh:mm'"
+			msg.send "That's not a valid date! Reset the beer clock by typing 'bot reset beer clock mm/dd/yyyy hh:mm'"
 
 		# otherwise, reset the date
 		else
 			# alert people of 24-hour format if they type 5:30
 			if newHappyHour.getHours() < 12
-				msg.reply "Did you really mean to set happy hour to a time before noon? Remember to use a 24-hour time when setting the beer clock."
+				msg.send "Did you really mean to set happy hour to a time before noon? Remember to use a 24-hour time when setting the beer clock."
 
 			# if proper date and time, reset the beer clock
 			else
 				robot.brain.happyHour ?= {} # make sure our storage object exists
 				robot.brain.happyHour.start = newHappyHour
 				robot.brain.happyHour.end = new Date(robot.brain.happyHour.start.getTime() + 1000 * 60 * 389)
-				msg.reply "Happy hour will start at #{robot.brain.happyHour.start} and end at #{robot.brain.happyHour.end}"
+				msg.send "Happy hour will start at #{robot.brain.happyHour.start} and end at #{robot.brain.happyHour.end}"
 
 	# send back stored times if user asks for them
 	robot.respond /get beer clock/i, (msg) ->
 		if robot.brain.happyHour
-			msg.reply "Happy hour will start at #{new Date(robot.brain.happyHour.start)} and end at #{new Date(robot.brain.happyHour.end)}."
+			msg.send "Happy hour will start at #{new Date(robot.brain.happyHour.start)} and end at #{new Date(robot.brain.happyHour.end)}."
 		else
-			msg.reply "Happy hour hasn't been set yet! Set it using 'bot reset beer clock'"
+			msg.send "Happy hour hasn't been set yet! Set it using 'bot reset beer clock'"
 
 	# respond to 'beer <whatever>' with beer countdown
 	robot.respond /beer (.*)/i, (msg) ->
@@ -51,8 +51,8 @@ module.exports = (robot) ->
 		# check storage of happy hour
 		# if not there, set to the date and time of a known happy hour
 		robot.brain.happyHour ?= {}
-		robot.brain.happyHour.start ?= new Date("10/25/2013 17:30")
-		robot.brain.happyHour.end ?=  new Date("10/25/2013 23:59")
+		robot.brain.happyHour.start ?= new Date("11/8/2013 17:30")
+		robot.brain.happyHour.end ?=  new Date("11/8/2013 23:59")
 
 		# set local variables to stored times
 		happyHourStart = new Date(robot.brain.happyHour.start)
@@ -75,11 +75,11 @@ module.exports = (robot) ->
 		# if it's not happy hour, return time to happy hour
 		if now < happyHourStart
 			timeToHappy = new Date (happyHourStart - now)
-			msg.reply "Happy hour starts in #{formatTime(timeToHappy)}."
+			msg.send "Happy hour starts in #{formatTime(timeToHappy)}."
 
 		# if for some reason it hits the fan...
 		else
-			msg.reply "Sorry. I don't know when happy hour is. Please try 'bot reset beer clock mm/dd/yyyy hh:mm' to set the beer clock."
+			msg.send "Sorry. I don't know when happy hour is. Please try 'bot reset beer clock mm/dd/yyyy hh:mm' to set the beer clock."
 
 	# format the time to h hours m minutes and s seconds until happy hour
 	formatTime = (time) ->
