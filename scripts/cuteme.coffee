@@ -2,7 +2,7 @@
 #   Cute me is a way to get pictures of cute things
 #
 # Dependencies:
-#   None
+#   "underscore" : http://underscorejs.org/
 #
 # Configuration:
 #   None
