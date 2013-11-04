@@ -32,15 +32,17 @@ module.exports = (robot) ->
 
 			# if proper date and time, reset the beer clock
 			else
-				robot.brain.set 'happyHourStart', newHappyHour
-				start = robot.brain.get 'happyHourStart'
-				end = new Date(start.getTime() + 1000 * 60 * 389)
-				robot.brain.set 'happyHourEnd', end
-				msg.reply "Happy hour will start at #{robot.brain.get 'happyHourStart'} and end at #{robot.brain.get 'happyHourEnd'}"
+				robot.brain.happyHour ?= {} # make sure our storage object exists
+				robot.brain.happyHour.start = newHappyHour
+				robot.brain.happyHour.end = new Date(robot.brain.happyHour.start.getTime() + 1000 * 60 * 389)
+				msg.reply "Happy hour will start at #{robot.brain.happyHour.start} and end at #{robot.brain.happyHour.end}"
 
 	# send back stored times if user asks for them
 	robot.respond /get beer clock/i, (msg) ->
-		msg.reply "Happy hour will start at #{new Date(robot.brain.get 'happyHourStart')} and end at #{new Date(robot.brain.get 'happyHourEnd')}."
+		if robot.brain.happyHour
+			msg.reply "Happy hour will start at #{new Date(robot.brain.happyHour.start)} and end at #{new Date(robot.brain.happyHour.end)}."
+		else
+			msg.reply "Happy hour hasn't been set yet! Set it using 'bot reset beer clock'"
 
 	# respond to 'beer <whatever>' with beer countdown
 	robot.respond /beer (.*)/i, (msg) ->
@@ -48,14 +50,13 @@ module.exports = (robot) ->
 		
 		# check storage of happy hour
 		# if not there, set to the date and time of a known happy hour
-		unless robot.brain.get 'happyHourStart' 
-			robot.brain.set 'happyHourStart', new Date("10/25/2013 17:30")
-		unless robot.brain.get 'happyHourEnd'
-			robot.brain.set 'happyHourEnd', new Date("10/25/2013 23:59")
+		robot.brain.happyHour ?= {}
+		robot.brain.happyHour.start ?= new Date("10/25/2013 17:30")
+		robot.brain.happyHour.end ?=  new Date("10/25/2013 23:59")
 
 		# set local variables to stored times
-		happyHourStart = new Date(robot.brain.get 'happyHourStart')
-		happyHourEnd = new Date(robot.brain.get 'happyHourEnd')
+		happyHourStart = new Date(robot.brain.happyHour.start)
+		happyHourEnd = new Date(robot.brain.happyHour.end)
 
 		# if the current happy hour has passed, reset it to one week in the future
 		# keep doing that until happy hour is in the future
@@ -64,8 +65,8 @@ module.exports = (robot) ->
 			until happyHourEnd > now
 				happyHourStart.setTime(happyHourStart.getTime() + 7 * 24 * 60 * 60 * 1000)
 				happyHourEnd.setTime(happyHourEnd.getTime() + 7 * 24 * 60 * 60 * 1000)
-			robot.brain.set 'happyHourStart', happyHourStart
-			robot.brain.set 'happyHourEnd', happyHourEnd
+			robot.brain.happyHour.start =  happyHourStart
+			robot.brain.happyHour.end = happyHourEnd
 
 		# if it's currently happy hour, stop talking to the bot!
 		if now > happyHourStart && now < happyHourEnd
