@@ -5,27 +5,32 @@ module.exports = (robot) ->
   robot.brain.data.instructorQueue ?= []
   robot.brain.data.instructorQueuePops ?= []
 
-  queueStudent = (name) ->
+  queueStudent = (name, reason) ->
     robot.brain.data.instructorQueue.push
       name: name
       queuedAt: new Date()
+      reason: reason
 
   stringifyQueue = ->
     _.reduce robot.brain.data.instructorQueue, (reply, student) ->
       reply += "\n"
-      reply += "#{student.name} at #{student.queuedAt}"
+      reply += "#{student.name} at #{student.queuedAt} for #{student.reason}"
       reply
     , ""
 
   popStudent = ->
     robot.brain.data.instructorQueue.shift()
 
-  robot.respond /q(ueue)? me/i, (msg) ->
+  robot.respond /q(ueue)? me$/i, (msg) ->
+    msg.reply "queue me now requires more information.  Try 'bot queue me for rails help'"
+
+  robot.respond /q(ueue)? me for (.+)/i, (msg) ->
     name = msg.message.user.mention_name || msg.message.user.name
+    reason = msg.match[2]
     if _.any(robot.brain.data.instructorQueue, (student) -> student.name == name)
       msg.send "#{name} is already queued"
     else
-      queueStudent(name)
+      queueStudent name, reason
       msg.send "Current queue is: #{stringifyQueue()}"
 
   robot.respond /unq(ueue)? me/i, (msg) ->
@@ -46,7 +51,7 @@ module.exports = (robot) ->
       student.poppedAt = new Date()
       student.poppedBy = msg.message.user.mention_name || msg.message.user.name
       robot.brain.data.instructorQueuePops.push student
-      msg.reply "go help @#{student.name}, queued at #{student.queuedAt}"
+      msg.reply "go help @#{student.name} with #{student.reason}, queued at #{student.queuedAt}"
 
   robot.respond /student q(ueue)?/i, (msg) ->
     if _.isEmpty robot.brain.data.instructorQueue
