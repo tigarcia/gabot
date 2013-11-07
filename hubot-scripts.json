@@ -6,5 +6,6 @@
   "reload.coffee",
   "remember.coffee",
   "remind.coffee",
-  "karma.coffee"
+  "karma.coffee",
+  "botsnack.coffee"
 ]
