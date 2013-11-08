@@ -1,5 +1,7 @@
-util = require 'util'
-_ = require 'underscore'
+util   = require 'util'
+_      = require 'underscore'
+moment = require 'moment'
+tfmt   = (time) -> moment(time).format 'MMM Do, h:mm:ss a'
 
 module.exports = (robot) ->
   robot.brain.data.instructorQueue ?= []
@@ -14,7 +16,7 @@ module.exports = (robot) ->
   stringifyQueue = ->
     _.reduce robot.brain.data.instructorQueue, (reply, student) ->
       reply += "\n"
-      reply += "#{student.name} at #{student.queuedAt} for #{student.reason}"
+      reply += "#{student.name} at #{tfmt student.queuedAt} for #{student.reason}"
       reply
     , ""
 
@@ -51,7 +53,7 @@ module.exports = (robot) ->
       student.poppedAt = new Date()
       student.poppedBy = msg.message.user.mention_name || msg.message.user.name
       robot.brain.data.instructorQueuePops.push student
-      msg.reply "go help @#{student.name} with #{student.reason}, queued at #{student.queuedAt}"
+      msg.reply "go help @#{student.name} with #{student.reason}, queued at #{tfmt student.queuedAt}"
 
   robot.respond /student q(ueue)?/i, (msg) ->
     if _.isEmpty robot.brain.data.instructorQueue
@@ -71,5 +73,5 @@ module.exports = (robot) ->
   robot.router.get "/queue/pops", (req, res) ->
     res.setHeader 'Content-Type', 'text/html'
     _.each robot.brain.data.instructorQueuePops, (student) ->
-      res.write "#{student.name} queued at #{student.queuedAt} popped at #{student.poppedAt} by #{student.poppedBy || 'nobody'}<br/>"
+      res.write "#{student.name} queued at #{tfmt student.queuedAt} popped at #{tfmt student.poppedAt} by #{student.poppedBy || 'nobody'}<br/>"
     res.end()

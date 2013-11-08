@@ -26,7 +26,8 @@
     "underscore": "*",
     "clark": "*",
     "js-yaml": "*",
-    "request": "*"
+    "request": "*",
+    "moment": "*"
   },
   "engines": {
     "node": "0.10.x",
