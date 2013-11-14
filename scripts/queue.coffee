@@ -24,7 +24,11 @@ module.exports = (robot) ->
     robot.brain.data.instructorQueue.shift()
 
   robot.respond /q(ueue)? me$/i, (msg) ->
-    msg.reply "queue me now requires more information.  Try 'bot queue me for rails help'"
+    msg.reply "usage: bot queue me for [reason]"
+
+  robot.respond /q(ueue)? me(.+)/i, (msg) ->
+    unless msg.match[2].match /^[ ]*for/i
+      msg.reply "usage: bot queue me for [reason]"
 
   robot.respond /q(ueue)? me for (.+)/i, (msg) ->
     name = msg.message.user.mention_name || msg.message.user.name
