@@ -77,5 +77,5 @@ module.exports = (robot) ->
   robot.router.get "/queue/pops", (req, res) ->
     res.setHeader 'Content-Type', 'text/html'
     _.each robot.brain.data.instructorQueuePops, (student) ->
-      res.write "#{student.name} queued at #{tfmt student.queuedAt} popped at #{tfmt student.poppedAt} by #{student.poppedBy || 'nobody'}<br/>"
+      res.write "#{student.name} queued for #{student.reason} at #{tfmt student.queuedAt} popped at #{tfmt student.poppedAt} by #{student.poppedBy || 'nobody'}<br/>"
     res.end()
