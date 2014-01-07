@@ -28,7 +28,7 @@ module.exports = (robot) ->
         msg.send "#{mustachify}#{url}"
 
 imageMe = (msg, query, animated, faces, cb) ->
-  return if msg.message.room.toLowerCase().indexOf('business') == 0
+  return if msg.message.room.toLowerCase().indexOf('business') != -1
   cb = animated if typeof animated == 'function'
   cb = faces if typeof faces == 'function'
   q = v: '1.0', rsz: '8', q: query, safe: 'active'
