@@ -66,7 +66,8 @@ module.exports = (robot) ->
       msg.send stringifyQueue()
 
   robot.respond /empty q(ueue)?/i, (msg) ->
-    if msg.message.user.mention_name == 'kyle'
+    instructors = ["RafiSofaer", "AlexNotov","MarkusGuehrs", "DelmerReed", "SpencerEldred", "TimGarcia", "TriptaGupta"]
+    if instructors.indexOf(msg.message.user.mention_name) != -1
       robot.brain.data.instructorQueue = []
       msg.reply "cleared the queue"
 
