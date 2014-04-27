@@ -1,7 +1,23 @@
+# Description:
+#   organize the class.
+#
+# Dependencies:
+#   None
+#
+# Configuration:
+#   None
+#
+# Commands:
+#   hubot queue me for <reason> - puts someone on the student queue
+#   hubot student queue - displays the current student queue
+#   hubot unq(ueue)? me - removes student from queue
+
+
 util   = require 'util'
 _      = require 'underscore'
 moment = require 'moment'
 tfmt   = (time) -> moment(time).format 'MMM Do, h:mm:ss a'
+
 
 module.exports = (robot) ->
   robot.brain.data.instructorQueue ?= []
@@ -39,6 +55,19 @@ module.exports = (robot) ->
       queueStudent name, reason
       msg.send "Current queue is: #{stringifyQueue()}"
 
+
+  robot.respond /req(ueue)? me for (.+)/i, (msg) ->
+    reason = msg.match[2]
+    name = msg.message.user.mention_name || msg.message.user.name
+    student = _.find(robot.brain.data.instructorQueue, (student) ->
+      student.name == name)
+    if student != undefined
+      student.reason = reason
+      msg.send "Current queue updated: #{stringifyQueue()}"
+    else
+      msg.reply "you weren't in the queue"
+
+
   robot.respond /unq(ueue)? me/i, (msg) ->
     name = msg.message.user.mention_name || msg.message.user.name
     if _.any(robot.brain.data.instructorQueue, (student) -> student.name == name)
@@ -66,7 +95,7 @@ module.exports = (robot) ->
       msg.send stringifyQueue()
 
   robot.respond /empty q(ueue)?/i, (msg) ->
-    instructors = ["RafiSofaer", "AlexNotov","MarkusGuehrs", "DelmerReed", "SpencerEldred", "TimGarcia", "TriptaGupta"]
+    instructors = ["RafiSofaer", "AlexNotov","MarkusGuehrs", "StuartJones",  "DelmerReed", "SpencerEldred", "TimGarcia", "TriptaGupta", "ColtSteel", "JackieHerrlin"]
     if instructors.indexOf(msg.message.user.mention_name) != -1
       robot.brain.data.instructorQueue = []
       msg.reply "cleared the queue"
