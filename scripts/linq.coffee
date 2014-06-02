@@ -34,10 +34,10 @@ module.exports = (robot) ->
     undefined
 
   logInBot = (msg, callback) ->
-      # Sign In Hubot to Linqs, i.e. post the following
+    # Sign In Hubot to Linqs, i.e. post the following
     #   hubot = { user: {
-    #             email: "rahul@gmail.com", 
-    #             password: "12345678"}
+    #             email: ENV[HUBOT_USERNAME], 
+    #             password: ENV[HUBOT_PASSWORD]}
     #           }
 
 
@@ -45,7 +45,7 @@ module.exports = (robot) ->
               method: 'POST'
               host: 'localhost'
               port: 3000
-              path: '/users/sign_in?user[email]=rahul@gmail.com&user[password]=12345678' 
+              path: '/users/sign_in?user[email]=#{ENV[HUBOT_USERNAME]}&user[password]=#{ENV[HUBOT_PASSWORD]}' 
 
     req = http.request options, (res) ->
       setSession res
@@ -60,7 +60,7 @@ module.exports = (robot) ->
     , ""
 
   findLinks = (msg, linkTag) ->
-    msg.http("http://localhost:3000/links.json")
+    msg.http("http://linqs.herokuapp.com//links.json")
       .get() (err, res, body) ->
         results = JSON.parse(body).links;
         rawLinks = _.filter results, (link) ->
@@ -79,26 +79,20 @@ module.exports = (robot) ->
     urlAndTags.shift()
     tags = urlAndTags.join(" ")
 
-    newLink = link: {}
-    newLink.link =  title: "hubotLink", url: url
+    linkTitle = "hubotLink"
+    linkUrl = url
     encodedTags = encodeURIComponent(tags)
-    console.log(encodedTags )
     
     postLinqs = ()->
-      paramStr = "link[title]=#{newLink.link.title}"
-      paramStr += "&link[url]=#{newLink.link.url}"
+      paramStr = "link[title]=#{linkTitle}"
+      paramStr += "&link[url]=#{linkUrl}"
       paramStr += "&link[link_tags_attributes][0][tag_attributes][name]=#{encodedTags}"
-      console.log(paramStr)
-      msg.http("http://localhost:3000/links.json?"+ paramStr)
+      msg.http("http://linqs.herokuapp.com//links.json?"+ paramStr)
       .headers( cookie: "_linqs_session="+ robot.brain.data.linqSession, "Accept": "application/json")
       .post() (err, res, body) ->
-        console.log "post sent!!"
+        console.log("Message Sent")
 
-    msg.http("http://localhost:3000/links.json")
-      .query(newLink)
-      .headers( "_linqs_session": robot.brain.data.linqSession || "blah")
-      .post() (err, res, body) ->
-        logInBot(msg, postLinqs)
+    logInBot(msg, postLinqs)
 
     
                 
